@@ -835,6 +835,7 @@ class Runtime extends EventEmitter {
         const categoryInfo = {
             id: extensionInfo.id,
             name: maybeFormatMessage(extensionInfo.name),
+            extensionURL: extensionInfo.extensionURL,
             showStatusButton: extensionInfo.showStatusButton,
             blockIconURI: extensionInfo.blockIconURI,
             menuIconURI: extensionInfo.menuIconURI

@@ -49,7 +49,7 @@ import gdxforConnectionSmallIconURL from './gdxfor/gdxfor-small.svg';
 import faceSensingIconURL from './faceSensing/faceSensing.png';
 import faceSensingInsetIconURL from './faceSensing/faceSensing-small.svg';
 
-export default [
+const extensions = [
     {
         name: (
             <FormattedMessage
@@ -414,3 +414,8 @@ export default [
         helpLink: 'https://scratch.mit.edu/wedo'
     }
 ];
+
+export default extensions;
+
+import extensionLoader from './extensionLoader/index.jsx';
+extensions.unshift(extensionLoader);

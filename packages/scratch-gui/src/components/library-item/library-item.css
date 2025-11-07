@@ -19,8 +19,7 @@
     border-style: solid;
     border-color: $ui-black-transparent;
     border-radius: $space;
-    text-align: center;
-    cursor: pointer;
+    /* text-align: center; */
 }
 
 .library-item-extension {
@@ -63,6 +62,12 @@
     position: absolute;
     height: 100px;
     width: 100%;
+    cursor: pointer;
+}
+
+.library-item-image-container:hover {
+    border-width: 2px;
+    border-color: $motion-primary;
 }
 
 .library-item-inset-image-container {
@@ -120,6 +125,12 @@
 
 .featured-image-container {
     position: relative;
+    cursor: pointer;
+}
+
+.featured-image-container:hover {
+    border-width: 2px;
+    border-color: $motion-primary;
 }
 
 .featured-image {
@@ -141,6 +152,36 @@
 [dir="rtl"] .featured-extension-text {
     text-align: right;
     padding-right: 1.25rem;
+}
+
+.featured-extension-help {
+    padding-right: 1.25rem;
+    font-size: 12px;
+}
+
+.featured-extension-url {
+    padding-right: 1.25rem;
+    font-size: 9px;
+}
+
+.copy-tooltip {
+    position: fixed;
+    background-color: #4c97ff;
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 11px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+    z-index: 1000;
+    transform: translate(-50%, -100%);
+    margin-top: -0.5rem;
+}
+
+.copy-tooltip.show {
+    opacity: 1;
 }
 
 .featured-description {
