@@ -1,0 +1,57 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "chrome",
+      "request": "launch",
+      "preLaunchTask": "start https",
+      "name": "debug on dev-server",
+      "url": "https://localhost:8601/",
+      "webRoot": "${workspaceFolder}/..",
+      "sourceMaps": true,
+      "sourceMapRenames": true,
+      "sourceMapPathOverrides": {
+        "webpack://GUI/*": "${webRoot}/scratch-editor/packages/scratch-gui/*",
+        "webpack://GUI/scratch-vm/*": "${webRoot}/scratch-editor/packages/scratch-vm/*",
+        "webpack://GUI/scratch-render/*": "${webRoot}/scratch-editor/packages/scratch-render/*",
+        "webpack://GUI/scratch-svg-renderer/*": "${webRoot}/scratch-editor/packages/scratch-svg-renderer/*",
+        "https://0.0.0.0:5500/*": "${webRoot}/*", // local extension server for debugging
+      }
+    },
+    {
+      "type": "chrome",
+      "request": "launch",
+      "name": "attach on dev-server",
+      "url": "https://localhost:8601/",
+      "webRoot": "${workspaceFolder}/..",
+      "sourceMaps": true,
+      "sourceMapRenames": true,
+      "sourceMapPathOverrides": {
+        "webpack://GUI/*": "${webRoot}/scratch-editor/packages/scratch-gui/*",
+        "webpack://GUI/scratch-vm/*": "${webRoot}/scratch-editor/packages/scratch-vm/*",
+        "webpack://GUI/scratch-render/*": "${webRoot}/scratch-editor/packages/scratch-render/*",
+        "webpack://GUI/scratch-svg-renderer/*": "${webRoot}/scratch-editor/packages/scratch-svg-renderer/*",
+        "https://0.0.0.0:5500/*": "${webRoot}/*", // local extension server for debugging
+      }
+    },
+    {
+      "type": "chrome",
+      "request": "launch",
+      "name": "attach on live server",
+      "url": "https://0.0.0.0:5500/scratch-editor/packages/scratch-gui/build/",
+      "webRoot": "${workspaceFolder}/..",
+      "sourceMaps": true,
+      "sourceMapRenames": true,
+      "sourceMapPathOverrides": {
+        "webpack://GUI/*": "${webRoot}/scratch-editor/packages/scratch-gui/*",
+        "webpack://GUI/scratch-vm/*": "${webRoot}/scratch-editor/packages/scratch-vm/*",
+        "webpack://GUI/scratch-render/*": "${webRoot}/scratch-editor/packages/scratch-render/*",
+        "webpack://GUI/scratch-svg-renderer/*": "${webRoot}/scratch-editor/packages/scratch-svg-renderer/*",
+        "https://0.0.0.0:5500/*": "${webRoot}/*", // local extension server for debugging
+      }
+    }
+  ]
+}

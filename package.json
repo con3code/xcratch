@@ -12,6 +12,7 @@
   },
   "scripts": {
     "build": "cross-env NODE_ENV=production npm run --workspaces build",
+    "build:dev": "cross-env NODE_ENV=development npm run --workspaces build",
     "build-monorepo": "cross-env-shell ./scripts/build-monorepo.sh",
     "clean": "npm run --workspaces clean",
     "prepare": "husky install",
