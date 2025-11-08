@@ -27,3 +27,7 @@ npm-*
 
 # for act
 .secrets
+
+# PWA
+assetsManifest.json
+service-worker.js
