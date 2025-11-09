@@ -163,8 +163,10 @@ const buildConfig = baseConfig.clone()
             // This output is loaded using a file:// scheme from the local file system.
             // Having `publicPath: '/'` (the default) means the `gui.js` file in `build/index.html`
             // would be looked for at the root of the filesystem, which is incorrect.
-            // Hence, we're resetting the public path to be relative.
-            publicPath: ''
+            // Use 'auto' to let webpack determine the publicPath automatically based on the
+            // current location (document.currentScript or import.meta.url), which properly
+            // handles both HTTP and file:// protocols for loading chunks and web workers.
+            publicPath: 'auto'
         }
     })
     .addPlugin(new HtmlWebpackPlugin({
