@@ -99,6 +99,11 @@ class Backpack extends React.Component {
         this.setState({loading: true}, () => {
             payloader(dragInfo.payload, this.props.vm)
                 .then(payload => {
+                    if (this.props.host === 'localStorage') {
+                        if (presaveAsset) {
+                            return {id: presaveAsset.assetId, ...payload};
+                        }
+                    }
                     // Force the asset to save to the asset server before storing in backpack
                     // Ensures any asset present in the backpack is also on the asset server
                     if (presaveAsset && !presaveAsset.clean) {
@@ -253,8 +258,8 @@ const getTokenAndUsername = state => {
     const tokenMatches = window.location.href.match(/[?&]token=([^&]*)&?/);
     const usernameMatches = window.location.href.match(/[?&]username=([^&]*)&?/);
     return {
-        token: tokenMatches ? tokenMatches[1] : null,
-        username: usernameMatches ? usernameMatches[1] : null
+        token: tokenMatches ? tokenMatches[1] : 'localToken', // For localStorage backpack
+        username: usernameMatches ? usernameMatches[1] : 'localUser' // For localStorage backpack
     };
 };
 
