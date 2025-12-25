@@ -25,6 +25,7 @@ const costumePayload = (scratchStorage, costume) => {
         break;
     default:
         alert(`Cannot serialize for format: ${assetDataFormat}`); // eslint-disable-line
+        return null; // Unsupported format
     }
 
     // Do not generate the thumbnail from the raw asset. Instead use the getCostumeUrl
