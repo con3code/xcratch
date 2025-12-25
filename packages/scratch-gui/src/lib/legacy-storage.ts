@@ -111,6 +111,9 @@ export class LegacyStorage implements GUIStorage {
     }
 
     private getProjectGetConfig (projectAsset) {
+        if (/^(http|https):\/\//.test(projectAsset.assetId)) {
+            return projectAsset.assetId;
+        }
         const path = `${this.projectHost}/${projectAsset.assetId}`;
         const qs = this.projectToken ? `?token=${this.projectToken}` : '';
         return path + qs;
