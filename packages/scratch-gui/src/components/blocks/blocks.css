@@ -97,3 +97,28 @@
     min-width: auto;
     min-height: auto;
 }
+
+/* Show whole shape of blocks when mouse over on the pallet. */
+.blocks :global(.blocklyFlyout:hover) {
+    overflow: visible;
+    clip-path: inset(0 -100vw 0 0);
+    -webkit-clip-path: inset(0 -100vw 0 0);
+}
+
+[dir="rtl"] .blocks :global(.blocklyFlyout:hover) {
+    clip-path: inset(0 0 0 -100vw);
+    -webkit-clip-path: inset(0 0 0 -100vw);
+}
+
+.blocks :global(.blocklyFlyout:hover .blocklyWorkspace) {
+    -webkit-clip-path: none;
+    clip-path: none;
+}
+
+.blocks :global(.blocklyScrollbarBackground:hover) {
+    opacity: 0.05;
+}
+
+.blocks :global(.blocklyFlyoutScrollbar) {
+    margin-left: 4px;
+}
