@@ -68,6 +68,7 @@ const extensions = [
                 id="gui.extension.music.description"
             />
         ),
+        tags: ['sound', 'music', 'audio'],
         featured: true
     },
     {
@@ -88,6 +89,7 @@ const extensions = [
                 id="gui.extension.pen.description"
             />
         ),
+        tags: ['image', 'pen'],
         featured: true
     },
     {
@@ -108,6 +110,7 @@ const extensions = [
                 id="gui.extension.videosensing.description"
             />
         ),
+        tags: ['image', 'video'],
         featured: true
     },
     {
@@ -128,6 +131,7 @@ const extensions = [
                 id="gui.extension.faceSensing.description"
             />
         ),
+        tags: ['image', 'video', 'ai', 'ml', 'machine learning', `vision`],
         featured: true
     },
     {
@@ -149,6 +153,7 @@ const extensions = [
                 id="gui.extension.text2speech.description"
             />
         ),
+        tags: ['sound', 'audio', 'speech', 'text'],
         featured: true,
         internetConnectionRequired: true
     },
@@ -171,6 +176,7 @@ const extensions = [
                 id="gui.extension.translate.description"
             />
         ),
+        tags: ['text', 'translation', 'language'],
         featured: true,
         internetConnectionRequired: true
     },
@@ -187,6 +193,7 @@ const extensions = [
                 id="gui.extension.makeymakey.description"
             />
         ),
+        tags: ['device', 'hardware'],
         featured: true
     },
     {
@@ -202,6 +209,7 @@ const extensions = [
                 id="gui.extension.microbit.description"
             />
         ),
+        tags: ['device', 'hardware'],
         featured: true,
         disabled: false,
         bluetoothRequired: true,
@@ -246,6 +254,7 @@ const extensions = [
                 id="gui.extension.gdxfor.description"
             />
         ),
+        tags: ['device', 'hardware'],
         featured: true,
         disabled: false,
         bluetoothRequired: true,
@@ -290,6 +299,7 @@ const extensions = [
                 id="gui.extension.ev3.description"
             />
         ),
+        tags: ['device', 'hardware'],
         featured: true,
         disabled: false,
         bluetoothRequired: true,
@@ -334,6 +344,7 @@ const extensions = [
                 id="gui.extension.boost.description"
             />
         ),
+        tags: ['device', 'hardware'],
         featured: true,
         disabled: false,
         bluetoothRequired: true,
@@ -380,6 +391,7 @@ const extensions = [
                 id="gui.extension.wedo2.description"
             />
         ),
+        tags: ['device', 'hardware'],
         featured: true,
         disabled: false,
         bluetoothRequired: true,

@@ -7,6 +7,7 @@ import intlShape from '../lib/intlShape.js';
 import log from '../lib/log.js';
 
 import extensionLibraryContent from '../lib/libraries/extensions/index.jsx';
+import extensionTags from '../lib/libraries/extension-tags.js';
 
 import LibraryComponent from '../components/library/library.jsx';
 import extensionIcon from '../components/action-menu/icon--sprite.svg';
@@ -33,6 +34,46 @@ const messages = defineMessages({
         defaultMessage: 'Could not load extension from: ',
         description: 'Error message when extension could not be loaded',
         id: 'xcratch.extensionLibrary.couldNotLoadExtension'
+    },
+    functionExtension: {
+        defaultMessage: 'Function',
+        description: 'Tag for filtering function enhancement extensions',
+        id: 'xcratch.tag.functionExtension'
+    },
+    imageExtension: {
+        defaultMessage: 'Image',
+        description: 'Tag for filtering visual enhancement extensions',
+        id: 'xcratch.tag.imageExtension'
+    },
+    soundExtension: {
+        defaultMessage: 'Sound',
+        description: 'Tag for filtering audio enhancement extensions',
+        id: 'xcratch.tag.soundExtension'
+    },
+    textExtension: {
+        defaultMessage: 'Text',
+        description: 'Tag for filtering text enhancement extensions',
+        id: 'xcratch.tag.textExtension'
+    },
+    calculationExtension: {
+        defaultMessage: 'Calculation',
+        description: 'Tag for filtering calculation enhancement extensions',
+        id: 'xcratch.tag.calculationExtension'
+    },
+    networkExtension: {
+        defaultMessage: 'Network',
+        description: 'Tag for filtering network enhancement extensions',
+        id: 'xcratch.tag.networkExtension'
+    },
+    deviceExtension: {
+        defaultMessage: 'Device',
+        description: 'Tag for filtering device enhancement extensions',
+        id: 'xcratch.tag.deviceExtension'
+    },
+    aiExtension: {
+        defaultMessage: 'AI',
+        description: 'Tag for filtering AI enhancement extensions',
+        id: 'xcratch.tag.aiExtension'
     }
 });
 
@@ -229,12 +270,6 @@ class ExtensionLibrary extends React.PureComponent {
             // Clear preloadedExtensions to avoid duplicate registration.
             preloaded = true;
         }
-
-        // Workaround to avoid official translation process.
-        Object.assign(
-            this.props.intl.messages,
-            translations[this.props.intl.locale]
-        );
     }
 
     async handleItemSelect (item) {
@@ -348,7 +383,9 @@ class ExtensionLibrary extends React.PureComponent {
         return (
             <LibraryComponent
                 data={extensionLibraryThumbnailData}
-                filterable={false}
+                filterable
+                tags={extensionTags}
+                withCategories
                 id="extensionLibrary"
                 title={this.props.intl.formatMessage(messages.extensionTitle)}
                 visible={this.props.visible}
