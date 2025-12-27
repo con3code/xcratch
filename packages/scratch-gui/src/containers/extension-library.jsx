@@ -35,18 +35,6 @@ const messages = defineMessages({
     }
 });
 
-// Workaround to avoid official translation process.
-const translations = {
-    'ja': {
-        'xcratch.extensionLibrary.confirmReplacingExtension': '拡張機能を置き換えますか?\n\n拡張機能名: {name}\n読み込み元: {url}',
-        'xcratch.extensionLibrary.couldNotLoadExtension': '拡張機能をロードできませんでした: {url}'
-    },
-    'ja-Hira': {
-        'xcratch.extensionLibrary.confirmReplacingExtension': 'かくちょうきのうをおきかえますか?\n\nかくちょうきのうめい: {name}\nよみこみもと: {url}',
-        'xcratch.extensionLibrary.couldNotLoadExtension': 'かくちょうきのうをロードできませんでした: {url}'
-    }
-};
-
 class ExtensionLibrary extends React.PureComponent {
     constructor (props) {
         super(props);
@@ -69,11 +57,6 @@ class ExtensionLibrary extends React.PureComponent {
         let id = item.extensionId;
         const url = item.extensionURL ? item.extensionURL : id;
         if (!item.disabled && !id) {
-            // Workaround to avoid official translation process.
-            Object.assign(
-                this.props.intl.messages,
-                translations[this.props.intl.locale]
-            );
             let inputUrl = url;
             return prompt(
                 {

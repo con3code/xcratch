@@ -1,5 +1,14 @@
 import {isRtl} from 'scratch-l10n';
 import editorMessages from 'scratch-l10n/locales/editor-msgs';
+import extensionLibraryTranslations from '../containers/extension-library-translations.js';
+
+// Inject custom Xcratch tag translations ahead of locale initialization.
+Object.keys(extensionLibraryTranslations).forEach(locale => {
+    editorMessages[locale] = {
+        ...(editorMessages[locale] || {}),
+        ...extensionLibraryTranslations[locale]
+    };
+});
 
 const UPDATE_LOCALES = 'scratch-gui/locales/UPDATE_LOCALES';
 const SELECT_LOCALE = 'scratch-gui/locales/SELECT_LOCALE';
