@@ -19,14 +19,20 @@ if (process.env.NODE_ENV === 'production' && typeof window === 'object') {
 
 import styles from './player.css';
 
-const Player = ({isPlayerOnly, onSeeInside, projectId}) => (
+const openEditor = () => {
+    const editorPath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/player'));
+    window.open(`${window.location.protocol}//${window.location.host}${editorPath}${window.location.hash}`);
+};
+// eslint-disable-next-line no-unused-vars
+const Player = ({isPlayerOnly, onSeeInside, projectId, isFullScreen}) => (
     <Box className={classNames(isPlayerOnly ? styles.stageOnly : styles.editor)}>
-        {isPlayerOnly && <button onClick={onSeeInside}>{'See inside'}</button>}
+        {isPlayerOnly && <button onClick={openEditor}>{'Open Editor'}</button>}
         <GUI
             canEditTitle
             enableCommunity
             isPlayerOnly={isPlayerOnly}
             projectId={projectId}
+            isFullScreen={isFullScreen}
         />
     </Box>
 );
@@ -34,11 +40,13 @@ const Player = ({isPlayerOnly, onSeeInside, projectId}) => (
 Player.propTypes = {
     isPlayerOnly: PropTypes.bool,
     onSeeInside: PropTypes.func,
-    projectId: PropTypes.string
+    projectId: PropTypes.string,
+    isFullScreen: PropTypes.bool
 };
 
 const mapStateToProps = state => ({
-    isPlayerOnly: state.scratchGui.mode.isPlayerOnly
+    isPlayerOnly: state.scratchGui.mode.isPlayerOnly,
+    isFullScreen: state.scratchGui.mode.isFullScreen
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -62,4 +70,7 @@ const appTarget = document.createElement('div');
 document.body.appendChild(appTarget);
 
 const root = ReactDomClient.createRoot(appTarget);
-root.render(<WrappedPlayer isPlayerOnly />);
+root.render(<WrappedPlayer
+    isPlayerOnly
+    isFullScreen
+/>);
