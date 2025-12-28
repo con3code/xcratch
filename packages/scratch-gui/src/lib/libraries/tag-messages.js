@@ -1,5 +1,6 @@
 import {defineMessages} from 'react-intl';
 
+// internationalized messages for library tags
 export default defineMessages({
     all: {
         defaultMessage: 'All',
@@ -125,5 +126,45 @@ export default defineMessages({
         defaultMessage: 'Letters',
         description: 'Tag for filtering a library for letters',
         id: 'gui.libraryTags.letters'
+    },
+    functionExtension: {
+        defaultMessage: 'Function',
+        description: 'Tag for filtering function enhancement extensions',
+        id: 'xcratch.tag.functionExtension'
+    },
+    imageExtension: {
+        defaultMessage: 'Image',
+        description: 'Tag for filtering visual enhancement extensions',
+        id: 'xcratch.tag.imageExtension'
+    },
+    soundExtension: {
+        defaultMessage: 'Sound',
+        description: 'Tag for filtering audio enhancement extensions',
+        id: 'xcratch.tag.soundExtension'
+    },
+    textExtension: {
+        defaultMessage: 'Text',
+        description: 'Tag for filtering text enhancement extensions',
+        id: 'xcratch.tag.textExtension'
+    },
+    calculationExtension: {
+        defaultMessage: 'Calculation',
+        description: 'Tag for filtering calculation enhancement extensions',
+        id: 'xcratch.tag.calculationExtension'
+    },
+    networkExtension: {
+        defaultMessage: 'Network',
+        description: 'Tag for filtering network enhancement extensions',
+        id: 'xcratch.tag.networkExtension'
+    },
+    deviceExtension: {
+        defaultMessage: 'Device',
+        description: 'Tag for filtering device enhancement extensions',
+        id: 'xcratch.tag.deviceExtension'
+    },
+    aiExtension: {
+        defaultMessage: 'AI',
+        description: 'Tag for filtering AI enhancement extensions',
+        id: 'xcratch.tag.aiExtension'
     }
 });

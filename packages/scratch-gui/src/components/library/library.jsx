@@ -18,6 +18,10 @@ import Spinner from '../spinner/spinner.jsx';
 import {CATEGORIES} from '../../../src/lib/libraries/decks/index.jsx';
 import {getLocalStorageValue, setLocalStorageValue} from '../../lib/local-storage.js';
 
+// Categories from the extension library
+CATEGORIES.loaded = 'loaded';
+CATEGORIES.preloaded = 'preloaded';
+
 import styles from './library.css';
 
 const localStorageAvailable =
@@ -61,6 +65,16 @@ const messages = defineMessages({
         id: `gui.library.prompts`,
         defaultMessage: 'Prompts',
         description: 'Label for prompts category'
+    },
+    [CATEGORIES.loaded]: {
+        id: `xcratch.category.loaded`,
+        defaultMessage: 'Loaded',
+        description: 'Label for loaded extensions category'
+    },
+    [CATEGORIES.preloaded]: {
+        id: `xcratch.category.preloaded`,
+        defaultMessage: 'Preloaded',
+        description: 'Label for preloaded extensions category'
     }
 });
 
@@ -244,7 +258,8 @@ class LibraryComponent extends React.Component {
         }
 
         this.handleClose();
-        this.props.onItemSelected(selectedItem);
+        this.props.onItemSelected(this.getFilteredData()
+            .find(item => this.constructKey(item) === id));
     }
     handleClose () {
         this.props.onRequestClose();
@@ -335,6 +350,14 @@ class LibraryComponent extends React.Component {
         ));
     }
     constructKey (data) {
+        // Use extensionId or extensionURL as the primary key for extensions
+        if (data.extensionId) {
+            return data.extensionId;
+        }
+        if (data.extensionURL) {
+            return data.extensionURL;
+        }
+        // Fall back to name or rawURL for other library items
         return typeof data.name === 'string' ? data.name : data.rawURL;
     }
     scrollToTop () {
@@ -352,7 +375,9 @@ class LibraryComponent extends React.Component {
             description={data.description}
             disabled={data.disabled}
             extensionId={data.extensionId}
+            extensionURL={data.extensionURL}
             featured={data.featured}
+            helpLink={data.helpLink}
             hidden={data.hidden}
             icons={icons}
             id={key}

@@ -20,8 +20,50 @@ class LibraryItemComponent extends React.PureComponent {
     constructor (props) {
         super(props);
         bindAll(this, [
-            'renderImage'
+            'renderImage',
+            'handleLinkClick',
+            'handleExtensionUrlClick'
         ]);
+        this.state = {
+            urlCopied: false,
+            tooltipX: 0,
+            tooltipY: 0
+        };
+        this.tooltipRef = React.createRef();
+    }
+    handleLinkClick (e) {
+        // リンクのクリックイベントが親要素に伝播しないようにする
+        e.stopPropagation();
+    }
+    handleExtensionUrlClick (e) {
+        // リンクのクリックイベントが親要素に伝播しないようにする
+        e.preventDefault();
+        e.stopPropagation();
+        
+        // マウスの位置を取得
+        const x = e.clientX;
+        const y = e.clientY;
+        
+        // URLをクリップボードにコピー
+        if (this.props.extensionURL) {
+            navigator.clipboard.writeText(this.props.extensionURL)
+                .then(() => {
+                    // コピー成功のフィードバックを表示
+                    this.setState({
+                        urlCopied: true,
+                        tooltipX: x,
+                        tooltipY: y
+                    });
+                    // 2秒後にフィードバックを消す
+                    setTimeout(() => {
+                        this.setState({urlCopied: false});
+                    }, 2000);
+                })
+                .catch(err => {
+                    // eslint-disable-next-line no-console
+                    console.error('Failed to copy extension URL:', err);
+                });
+        }
     }
     renderImage (className, imageSource) {
         // Scratch Android and Scratch Desktop assume the user is offline and has
@@ -92,6 +134,40 @@ class LibraryItemComponent extends React.PureComponent {
                         <br />
                         <span className={styles.featuredDescription}>{this.props.description}</span>
                     </div>
+                    {this.props.helpLink ? (
+                        <div>
+                            <span className={styles.featuredExtensionHelp}>
+                                <a
+                                    href={this.props.helpLink}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    onClick={this.handleLinkClick}
+                                >{'👉 Help Link'}</a></span>
+                        </div>
+                    ) : null}
+                    {this.props.extensionURL ? (
+                        <div>
+                            <span className={styles.featuredExtensionUrl}>
+                                {'Module: '}
+                                <a
+                                    href={this.props.extensionURL}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    onClick={this.handleExtensionUrlClick}
+                                >{this.props.extensionURL}</a>
+                            </span>
+                            <span
+                                ref={this.tooltipRef}
+                                className={classNames(styles.copyTooltip, {[styles.show]: this.state.urlCopied})}
+                                style={{
+                                    left: `${this.state.tooltipX}px`,
+                                    top: `${this.state.tooltipY}px`
+                                }}
+                            >
+                                {'✓ Copied!'}
+                            </span>
+                        </div>
+                    ) : null}
                     {this.props.bluetoothRequired ||
                         this.props.internetConnectionRequired || this.props.collaborator ? (
                             <div className={styles.featuredExtensionMetadata}>
@@ -189,7 +265,9 @@ LibraryItemComponent.propTypes = {
     ]),
     disabled: PropTypes.bool,
     extensionId: PropTypes.string,
+    extensionURL: PropTypes.string,
     featured: PropTypes.bool,
+    helpLink: PropTypes.string,
     hidden: PropTypes.bool,
     iconSource: ScratchImage.ImageSourcePropType,
     insetIconURL: PropTypes.string,

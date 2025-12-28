@@ -97,6 +97,12 @@ class ExtensionManager {
         dispatch.setService('extensions', this).catch(e => {
             log.error(`ExtensionManager was unable to register extension service: ${JSON.stringify(e)}`);
         });
+
+        /**
+         * The list of preloaded extension classes.
+         * @type {Map.<string,object>}
+         */
+        this.preloadedExtensions = new Map();
     }
 
     /**
@@ -135,6 +141,109 @@ class ExtensionManager {
     }
 
     /**
+     * Fetch URL and return entry object and block class of the extension.
+     * @param {string} extensionURL - URL for module of the extension.
+     * @returns {{entry: object, blockClass: BlockClass}} Array with entry and block class of the extension.
+     */
+    fetchExtension (extensionURL) {
+        return import(/* webpackIgnore: true */ extensionURL)
+            .then(module => {
+                if (!module.entry) {
+                    throw new Error(`Entry not found in module for ${extensionURL}`);
+                }
+                const entry = module.entry;
+                entry.extensionURL = extensionURL;
+                
+                // If entry has blockClassURL, import blockClass from that URL
+                if (entry.blockClassURL) {
+                    // If blockClassURL is relative, resolve it against extensionURL
+                    let blockClassURL = entry.blockClassURL;
+                    if (!blockClassURL.match(/^https?:\/\//)) {
+                        // Relative path - resolve against extensionURL
+                        const baseURL = new URL(extensionURL, window.location.href);
+                        blockClassURL = new URL(blockClassURL, baseURL).href;
+                    }
+                    return import(/* webpackIgnore: true */ blockClassURL)
+                        .then(blockModule => {
+                            if (!blockModule.blockClass) {
+                                throw new Error(`blockClass not found in module for ${blockClassURL}`);
+                            }
+                            const blockClass = blockModule.blockClass;
+                            blockClass.extensionURL = extensionURL;
+                            return {entry: entry, blockClass: blockClass};
+                        });
+                }
+                
+                // Otherwise, use blockClass from the same module (old format)
+                if (!module.blockClass) {
+                    throw new Error(`blockClass not found in module for ${extensionURL}`);
+                }
+                const blockClass = module.blockClass;
+                blockClass.extensionURL = extensionURL;
+                return {entry: entry, blockClass: blockClass};
+            });
+    }
+
+    addBultinExtension (entry, blockClass) {
+        builtinExtensions[entry.extensionId] = () => blockClass;
+        this.extensionLibraryContent.unshift(entry);
+    }
+
+    /**
+     * Instanceate new block object and register that in the runtime.
+     * @param {object} entry - Entry object to register.
+     * @param {Function} blockClass - Class of block object to register.
+     * @param {boolean} preload - Whether the extension is preloaded. Default is false.
+     */
+    registerExtensionBlock (entry, blockClass, preload = false) {
+        if (preload) {
+            if (this.isExtensionLoaded(entry.extensionId)) {
+                // Do not preload the extension if it is already loaded.
+                return;
+            }
+            if (Array.from(this.preloadedExtensions.values())
+                .some(preloaded => preloaded.entry.extensionId === entry.extensionId)) {
+                // Do not preload the extension if it is already preloaded.
+                return;
+            }
+            entry.category = 'preloaded';
+            this.preloadedExtensions.set(entry.extensionURL, {entry: entry, blockClass: blockClass});
+            return;
+        }
+        const extensionInstance = new blockClass(this.runtime);
+        const extensionID = extensionInstance.getInfo().id;
+        if (entry.extensionId !== extensionID) {
+            // Reject by the security risk.
+            throw new Error(`Extension ID mismatch entry: '${entry.extensionId}' block: '${extensionID}'`);
+        }
+        entry.category = 'loaded';
+        if (this.isExtensionLoaded(extensionID)) {
+            // Remove from loaded extensions
+            const oldServiceName = this._loadedExtensions.get(extensionID);
+            this._loadedExtensions.delete(extensionID);
+            // Remove from dispatcher
+            delete dispatch.services[oldServiceName];
+            // Remove from block info
+            const oldBlockInfoIndex = this.runtime._blockInfo.findIndex(info => info.id === extensionID);
+            if (oldBlockInfoIndex >= 0) {
+                this.runtime._blockInfo.splice(oldBlockInfoIndex, 1);
+            }
+        }
+        const serviceName = this._registerInternalExtension(extensionInstance);
+        this._loadedExtensions.set(extensionID, serviceName);
+        const oldEntryIndex = this.extensionLibraryContent
+            .findIndex(libEntry => libEntry.extensionId === extensionID);
+        if (oldEntryIndex >= 0) {
+            // Remove from extension library
+            this.extensionLibraryContent.splice(oldEntryIndex, 1);
+        }
+        if (this.extensionLibraryContent) {
+            this.extensionLibraryContent.unshift(entry);
+        }
+        return;
+    }
+
+    /**
      * Load an extension by URL or internal extension ID
      * @param {string} extensionURL - the URL for the extension to load OR the ID of an internal extension
      * @returns {Promise} resolved once the extension is loaded and initialized or rejected on failure
@@ -155,13 +264,37 @@ class ExtensionManager {
             return Promise.resolve();
         }
 
-        return new Promise((resolve, reject) => {
-            // If we `require` this at the global level it breaks non-webpack targets, including tests
-            const worker = new Worker('./extension-worker.js');
+        // Find a builtin extension which have the extensionURL.
+        const builtinClassFunc = Object.values(builtinExtensions)
+            .find(blockClassFunc => blockClassFunc().extensionURL === extensionURL);
+        if (builtinClassFunc) {
+            const blockClass = builtinClassFunc();
+            const extensionInstance = new blockClass(this.runtime);
+            const serviceName = this._registerInternalExtension(extensionInstance);
+            this._loadedExtensions.set(blockClass.EXTENSION_ID, serviceName);
+            return Promise.resolve();
+        }
 
-            this.pendingExtensions.push({extensionURL, resolve, reject});
-            dispatch.addWorker(worker);
-        });
+        // To access the runtime even in outer extensions, it loaded by dynamic import() instead of extension-worker.
+        // Try to load from URL first, fallback to preloaded version if it fails (regardless of online status)
+        return this.fetchExtension(extensionURL)
+            .then(({entry, blockClass}) => {
+                this.registerExtensionBlock(entry, blockClass);
+            })
+            .catch(error => {
+                // If the extension is preloaded, register it.
+                const preloadedExt = this.preloadedExtensions.get(extensionURL);
+                if (preloadedExt) {
+                    this.registerExtensionBlock(preloadedExt.entry, preloadedExt.blockClass);
+                    log.info(`Failed to load from URL, using preloaded extension: ${extensionURL}`);
+                } else {
+                    throw error;
+                }
+            })
+            .catch(error => {
+                log.error(`Failed to load extension: ${extensionURL}: ${error}`);
+                // Ignore error to continue loading lest of the project data.
+            });
     }
 
     /**

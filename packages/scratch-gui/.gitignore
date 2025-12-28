@@ -31,3 +31,6 @@ npm-*
 # PWA
 assetsManifest.json
 service-worker.js
+
+# preload
+/preload

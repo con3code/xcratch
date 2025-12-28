@@ -1,5 +1,29 @@
 import {isRtl} from 'scratch-l10n';
 import editorMessages from 'scratch-l10n/locales/editor-msgs';
+import extensionLibraryTranslations from '../containers/extension-library-translations.js';
+import xcratchTagTranslations from '../lib/libraries/xcratch-tag-translations.js';
+import xcratchCategoryTranslations from '../lib/libraries/xcratch-category-translations.js';
+
+Object.keys(extensionLibraryTranslations).forEach(locale => {
+    editorMessages[locale] = {
+        ...(editorMessages[locale] || {}),
+        ...extensionLibraryTranslations[locale]
+    };
+});
+
+Object.keys(xcratchTagTranslations).forEach(locale => {
+    editorMessages[locale] = {
+        ...(editorMessages[locale] || {}),
+        ...xcratchTagTranslations[locale]
+    };
+});
+
+Object.keys(xcratchCategoryTranslations).forEach(locale => {
+    editorMessages[locale] = {
+        ...(editorMessages[locale] || {}),
+        ...xcratchCategoryTranslations[locale]
+    };
+});
 
 const UPDATE_LOCALES = 'scratch-gui/locales/UPDATE_LOCALES';
 const SELECT_LOCALE = 'scratch-gui/locales/SELECT_LOCALE';
