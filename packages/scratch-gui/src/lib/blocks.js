@@ -1,3 +1,5 @@
+import {installEnhancedCleanup} from './enhanced-cleanup.js';
+
 /**
  * Connect scratch blocks with the vm
  * @param {VirtualMachine} vm - The scratch vm
@@ -363,5 +365,12 @@ export default function (vm, useCatBlocks) {
         return true;
     };
 
+    // Install enhanced cleanup functionality
+    installEnhancedCleanup(ScratchBlocks, {
+        useEnhancedCleanup: true,
+        animate: true,
+        animationDelay: 10
+    });
+    
     return ScratchBlocks;
 }
