@@ -9,7 +9,7 @@ import log from '../lib/log.js';
 import {PLATFORM} from '../lib/platform.js';
 
 const onClickLogo = () => {
-    window.location = 'https://scratch.mit.edu';
+    window.location = 'https://xcratch.github.io';
 };
 
 const handleTelemetryModalCancel = () => {
@@ -79,7 +79,7 @@ export default appTarget => {
             <WrappedGui
                 canEditTitle
                 backpackVisible
-                showComingSoon
+                showComingSoon={false}
                 backpackHost={backpackHost}
                 canSave={false}
                 onClickLogo={onClickLogo}

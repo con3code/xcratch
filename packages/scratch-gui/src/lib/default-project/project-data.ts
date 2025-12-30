@@ -62,22 +62,22 @@ const projectData = (translateFunction?: TranslatorFunction): object => {
                 currentCostume: 0,
                 costumes: [
                     {
-                        assetId: 'bcf454acf82e4504149f7ffe07081dbc',
+                        assetId: '881c5994e99006fc05359d738af66337',
                         name: translator(messages.costume, {index: 1}),
                         bitmapResolution: 1,
-                        md5ext: 'bcf454acf82e4504149f7ffe07081dbc.svg',
+                        md5ext: '881c5994e99006fc05359d738af66337.svg',
                         dataFormat: 'svg',
-                        rotationCenterX: 48,
-                        rotationCenterY: 50
+                        rotationCenterX: 53.30362207219807,
+                        rotationCenterY: 19.978010296581317
                     },
                     {
-                        assetId: '0fb9be3e8397c983338cb71dc84d0b25',
+                        assetId: 'b6e71f1bf154c8a5470665fe87dd507c',
                         name: translator(messages.costume, {index: 2}),
                         bitmapResolution: 1,
-                        md5ext: '0fb9be3e8397c983338cb71dc84d0b25.svg',
+                        md5ext: 'b6e71f1bf154c8a5470665fe87dd507c.svg',
                         dataFormat: 'svg',
-                        rotationCenterX: 46,
-                        rotationCenterY: 53
+                        rotationCenterX: 53.30374213774783,
+                        rotationCenterY: 19.97796946977502
                     }
                 ],
                 sounds: [
@@ -104,6 +104,7 @@ const projectData = (translateFunction?: TranslatorFunction): object => {
         meta: {
             semver: '3.0.0',
             vm: '0.1.0',
+            origin: 'https://xcratch.github.io/editor',
             agent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36' // eslint-disable-line max-len
         }
     });

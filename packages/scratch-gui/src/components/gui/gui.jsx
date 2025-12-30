@@ -1,7 +1,7 @@
 import classNames from 'classnames';
 import omit from 'lodash.omit';
 import PropTypes from 'prop-types';
-import React, {useEffect, useCallback} from 'react';
+import React, {useEffect} from 'react';
 import {FormattedMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import MediaQuery from 'react-responsive';
@@ -25,7 +25,7 @@ import Watermark from '../../containers/watermark.jsx';
 import Backpack from '../../containers/backpack.jsx';
 import ExtensionsButton from '../extension-button/extension-button.jsx';
 import WebGlModal from '../../containers/webgl-modal.jsx';
-import TipsLibrary from '../../containers/tips-library.jsx';
+// import TipsLibrary from '../../containers/tips-library.jsx';
 import Cards from '../../containers/cards.jsx';
 import Alerts from '../../containers/alerts.jsx';
 import DragLayer from '../../containers/drag-layer.jsx';
@@ -42,7 +42,7 @@ import styles from './gui.css';
 import codeIcon from './icon--code.svg';
 import costumesIcon from './icon--costumes.svg';
 import soundsIcon from './icon--sounds.svg';
-import DebugModal from '../debug-modal/debug-modal.jsx';
+// import DebugModal from '../debug-modal/debug-modal.jsx';
 import {setPlatform} from '../../reducers/platform.js';
 import {setTheme} from '../../reducers/settings.js';
 import {PLATFORM} from '../../lib/platform.js';
@@ -84,9 +84,9 @@ const GUIComponent = props => {
         connectionModalVisible,
         costumeLibraryVisible,
         costumesTabVisible,
-        debugModalVisible,
-        onDebugModalClose,
-        onTutorialSelect,
+        // debugModalVisible,
+        // onDebugModalClose,
+        // onTutorialSelect,
         enableCommunity,
         hasActiveMembership,
         isCreating,
@@ -119,7 +119,7 @@ const GUIComponent = props => {
         onProjectTelemetryEvent,
         onRequestCloseBackdropLibrary,
         onRequestCloseCostumeLibrary,
-        onRequestCloseDebugModal,
+        // onRequestCloseDebugModal,
         onRequestCloseTelemetryModal,
         onSeeCommunity,
         onShare,
@@ -137,11 +137,11 @@ const GUIComponent = props => {
         telemetryModalVisible,
         colorMode,
         theme,
-        tipsLibraryVisible,
+        // tipsLibraryVisible,
         useExternalPeripheralList,
         username,
         userOwnsProject,
-        hideTutorialProjects,
+        // hideTutorialProjects,
         vm,
         ...componentProps
     } = omit(props, 'dispatch', 'setPlatform');
@@ -177,12 +177,12 @@ const GUIComponent = props => {
         tabSelected: classNames(tabStyles.reactTabsTabSelected, styles.isSelected)
     };
 
-    const onCloseDebugModal = useCallback(() => {
-        if (onDebugModalClose) {
-            onDebugModalClose();
-        }
-        onRequestCloseDebugModal();
-    }, [onDebugModalClose, onRequestCloseDebugModal]);
+    // const onCloseDebugModal = useCallback(() => {
+    //     if (onDebugModalClose) {
+    //         onDebugModalClose();
+    //     }
+    //     onRequestCloseDebugModal();
+    // }, [onDebugModalClose, onRequestCloseDebugModal]);
 
     if (isRendererSupported === null) {
         isRendererSupported = Renderer.isSupported();
@@ -238,12 +238,12 @@ const GUIComponent = props => {
                 {isRendererSupported ? null : (
                     <WebGlModal isRtl={isRtl} />
                 )}
-                {tipsLibraryVisible ? (
+                {/* {tipsLibraryVisible ? (
                     <TipsLibrary
                         hideTutorialProjects={hideTutorialProjects}
                         onTutorialSelect={onTutorialSelect}
                     />
-                ) : null}
+                ) : null} */}
                 {cardsVisible ? (
                     <Cards />
                 ) : null}
@@ -262,10 +262,10 @@ const GUIComponent = props => {
                         onRequestClose={onRequestCloseCostumeLibrary}
                     />
                 ) : null}
-                {<DebugModal
+                {/* {<DebugModal
                     isOpen={debugModalVisible}
                     onClose={onCloseDebugModal}
-                />}
+                />} */}
                 {backdropLibraryVisible ? (
                     <BackdropLibrary
                         vm={vm}
