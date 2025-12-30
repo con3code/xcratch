@@ -1,3 +1,5 @@
+import blocksOverrideTranslations from '../lib/blocks-override-translations.js';
+
 /**
  * Connect scratch blocks with the vm
  * @param {VirtualMachine} vm - The scratch vm
@@ -363,5 +365,13 @@ export default function (vm, useCatBlocks) {
         return true;
     };
 
+    // Override default messages with any provided by the localization system
+    Object.keys(blocksOverrideTranslations).forEach(locale => {
+        const localeTable = ScratchBlocks.ScratchMsgs.locales[locale];
+        Object.entries(blocksOverrideTranslations[locale]).forEach(([key, val]) => {
+            localeTable[key] = val;
+        });
+    });
+    
     return ScratchBlocks;
 }
