@@ -1,8 +1,16 @@
 import {isRtl} from 'scratch-l10n';
 import editorMessages from 'scratch-l10n/locales/editor-msgs';
+import missingTranslations from '../lib/missing-translations.js';
 import extensionLibraryTranslations from '../containers/extension-library-translations.js';
 import xcratchTagTranslations from '../lib/libraries/xcratch-tag-translations.js';
 import xcratchCategoryTranslations from '../lib/libraries/xcratch-category-translations.js';
+
+Object.keys(missingTranslations).forEach(locale => {
+    editorMessages[locale] = {
+        ...(editorMessages[locale] || {}),
+        ...missingTranslations[locale]
+    };
+});
 
 Object.keys(extensionLibraryTranslations).forEach(locale => {
     editorMessages[locale] = {
