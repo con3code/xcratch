@@ -1,3 +1,4 @@
+import {installEnhancedCleanup} from './enhanced-cleanup.js';
 import blocksOverrideTranslations from '../lib/blocks-override-translations.js';
 
 /**
@@ -364,6 +365,13 @@ export default function (vm, useCatBlocks) {
     ScratchBlocks.utils.is3dSupported = function () {
         return true;
     };
+
+    // Install enhanced cleanup functionality
+    installEnhancedCleanup(ScratchBlocks, {
+        useEnhancedCleanup: true,
+        animate: true,
+        animationDelay: 10
+    });
 
     // Override default messages with any provided by the localization system
     Object.keys(blocksOverrideTranslations).forEach(locale => {
