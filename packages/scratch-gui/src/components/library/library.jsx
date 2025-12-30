@@ -243,7 +243,7 @@ class LibraryComponent extends React.Component {
             this.animationFrameId = null;
         });
     }
-    handleSelect (id) {
+    async handleSelect (id) {
         const selectedItem = this.getFilteredData().find(item => this.constructKey(item) === id);
 
         if (this.state.shouldShowFaceSensingCallout && selectedItem.extensionId === 'faceSensing') {
@@ -257,9 +257,18 @@ class LibraryComponent extends React.Component {
             });
         }
 
-        this.handleClose();
-        this.props.onItemSelected(this.getFilteredData()
-            .find(item => this.constructKey(item) === id));
+        try {
+            const result = await Promise.resolve(this.props.onItemSelected(selectedItem));
+            if (result !== false) {
+                this.handleClose();
+            }
+        } catch (error) {
+            // Keep the library open when selection fails.
+            if (process.env.NODE_ENV !== 'production') {
+                // eslint-disable-next-line no-console
+                console.warn('Library selection failed:', error);
+            }
+        }
     }
     handleClose () {
         this.props.onRequestClose();

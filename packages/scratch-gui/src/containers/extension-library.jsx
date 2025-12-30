@@ -355,12 +355,22 @@ class ExtensionLibrary extends React.PureComponent {
                         .then(doReplace => {
                             if (doReplace) {
                                 this.props.vm.extensionManager.registerExtensionBlock(entry, blockClass);
-                                this.props.onCategorySelected(id);
+                                return new Promise(resolve => {
+                                    setTimeout(() => {
+                                        this.props.onCategorySelected(id);
+                                        resolve();
+                                    });
+                                });
                             }
                         });
                 }
                 this.props.vm.extensionManager.registerExtensionBlock(entry, blockClass);
-                this.props.onCategorySelected(id);
+                return new Promise(resolve => {
+                    setTimeout(() => {
+                        this.props.onCategorySelected(id);
+                        resolve();
+                    });
+                });
             })
             .catch(error => {
                 log.info(`Could not load extension class from ${inputUrl}:\n${error.stack}\n`);
@@ -370,7 +380,7 @@ class ExtensionLibrary extends React.PureComponent {
                         {url: inputUrl}
                     )
                 });
-                return;
+                return Promise.reject(error);
             });
         
     }
