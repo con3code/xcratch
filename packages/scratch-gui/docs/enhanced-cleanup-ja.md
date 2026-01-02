@@ -43,7 +43,6 @@
 
 コアとなるユーティリティ関数群:
 
-- `getVariableUsesById()` - `getVarModels()` を使ってブロック全体で変数の使用状況を追跡
 - `autoPositionComment()` - コメントの `autoPosition_()` メソッドを使って自動配置
 - `getOrderedTopBlockColumns()` - ブロックをX座標でグループ化し、カラムに整理
   - 256px以内のX座標を持つブロックを同じカラムにグループ化
@@ -145,33 +144,6 @@ for (const topBlock of topBlocks) {
 4. **ブロック間の間隔**: ブロックの高さ + グリッドサイズ
 5. **グリッドスナップ**: `position += gridSize - ((position + gridSize/2) % gridSize)` で計算
 
-### 変数使用状況の追跡
-
-変数の使用状況を追跡する際、`getVarModels()` メソッドを使用:
-
-```javascript
-export const getVariableUsesById = (id, workspace) => {
-    const uses = [];
-    const topBlocks = workspace.getTopBlocks(true);
-    
-    for (const topBlock of topBlocks) {
-        const kids = topBlock.getDescendants();
-        for (const block of kids) {
-            const blockVariables = block.getVarModels ? block.getVarModels() : null;
-            if (blockVariables) {
-                for (const blockVar of blockVariables) {
-                    if (blockVar.getId() === id) {
-                        uses.push(block);
-                    }
-                }
-            }
-        }
-    }
-    
-    return uses;
-};
-```
-
 ### コメントの自動配置
 
 コメントの `autoPosition_` メソッドを使用して自動配置:
@@ -197,8 +169,7 @@ export const autoPositionComment = comment => {
 
 拡張クリーンアップはScratch blocksの読み込み時に自動的に有効化されます。ユーザーは以下の方法でトリガーできます:
 
-- ワークスペースを右クリックして「ブロックを整理」を選択
-- エディタ内の既存のクリーンアップトリガーを使用
+- コードを右クリックして「きれいにする」を選択
 
 ## 従来のクリーンアップとの違い
 
@@ -271,53 +242,6 @@ const result = installEnhancedCleanup(ScratchBlocks, options);
 if (result) {
     result.restore();
 }
-```
-
-## 今後の拡張可能性
-
-### 追加可能な機能
-
-1. **カスタムレイアウトパターン**: ユーザー定義のレイアウトルール
-2. **ブロックグループ化**: 関連するブロックを視覚的にグループ化
-3. **レイアウトプリセット**: よく使うレイアウトパターンの保存と読み込み
-4. **アニメーション**: ブロック移動時のスムーズなアニメーション効果
-
-### 設定の拡張
-
-将来的に追加可能なオプション:
-
-```javascript
-installEnhancedCleanup(ScratchBlocks, {
-    useEnhancedCleanup: true,
-    sortByPosition: true,
-    // 将来の拡張オプション例
-    columnSpacing: 'auto',        // カラム間の間隔
-    blockSpacing: 'compact',      // ブロック間の間隔
-    groupRelatedBlocks: false,    // 関連ブロックのグループ化
-    animationEnabled: true        // アニメーション効果
-});
-```
-
-## デバッグ情報
-
-開発時のデバッグには以下のログ出力が利用可能:
-
-- `log.warn()` - 警告メッセージ（フォールバック時など）
-- `log.error()` - エラーメッセージ（処理失敗時）
-
-ブラウザの開発者コンソールでこれらのログを確認できます。
-
-## ファイル構成
-
-```
-packages/scratch-gui/src/lib/
-├── blocks.js                    # 拡張クリーンアップの統合（変更）
-├── cleanup-utils.js             # コアユーティリティ関数（新規）
-├── enhanced-cleanup.js          # 統合レイヤー（新規）
-└── ENHANCED_CLEANUP.md          # 英語ドキュメント（新規）
-
-packages/scratch-gui/docs/
-└── enhanced-cleanup-ja.md       # 日本語仕様書（本ファイル）
 ```
 
 ## 参考資料

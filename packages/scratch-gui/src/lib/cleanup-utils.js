@@ -6,33 +6,6 @@
 import log from './log.js';
 
 /**
- * Get variable uses by ID
- * @param {string} id - Variable ID
- * @param {object} workspace - Blockly workspace
- * @returns {Array} Array of blocks using this variable
- */
-export const getVariableUsesById = (id, workspace) => {
-    const uses = [];
-    const topBlocks = workspace.getTopBlocks(true);
-    
-    for (const topBlock of topBlocks) {
-        const kids = topBlock.getDescendants();
-        for (const block of kids) {
-            const blockVariables = block.getVarModels ? block.getVarModels() : null;
-            if (blockVariables) {
-                for (const blockVar of blockVariables) {
-                    if (blockVar.getId() === id) {
-                        uses.push(block);
-                    }
-                }
-            }
-        }
-    }
-    
-    return uses;
-};
-
-/**
  * Auto position a comment near its associated block or in a good default location
  * @param {object} comment - Workspace comment
  */
