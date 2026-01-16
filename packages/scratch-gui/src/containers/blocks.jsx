@@ -4,8 +4,10 @@ import defaultsDeep from 'lodash.defaultsdeep';
 import makeToolboxXML from '../lib/make-toolbox-xml';
 import PropTypes from 'prop-types';
 import React from 'react';
+import {injectIntl} from 'react-intl';
 import VMScratchBlocks from '../lib/blocks';
 import VM from '@scratch/scratch-vm';
+import {initializeBlocksToImage} from '../lib/blocks-to-image';
 
 import analytics from '../lib/analytics';
 import log from '../lib/log.js';
@@ -100,6 +102,9 @@ class Blocks extends React.Component {
         this.ScratchBlocks.FieldColourSlider.activateEyedropper_ = this.props.onActivateColorPicker;
         this.ScratchBlocks.Procedures.externalProcedureDefCallback = this.props.onActivateCustomProcedures;
         this.ScratchBlocks.ScratchMsgs.setLocale(this.props.locale);
+
+        // Initialize blocks to image functionality
+        initializeBlocksToImage(this.ScratchBlocks, this.props.intl.formatMessage);
 
         const workspaceConfig = defaultsDeep({},
             Blocks.defaultOptions,
@@ -632,6 +637,9 @@ Blocks.propTypes = {
     canUseCloud: PropTypes.bool,
     customProceduresVisible: PropTypes.bool,
     extensionLibraryVisible: PropTypes.bool,
+    intl: PropTypes.shape({
+        formatMessage: PropTypes.func.isRequired
+    }).isRequired,
     isRtl: PropTypes.bool,
     isVisible: PropTypes.bool,
     locale: PropTypes.string.isRequired,
@@ -729,8 +737,8 @@ const mapDispatchToProps = dispatch => ({
 });
 
 export default errorBoundaryHOC('Blocks')(
-    connect(
+    injectIntl(connect(
         mapStateToProps,
         mapDispatchToProps
-    )(Blocks)
+    )(Blocks))
 );

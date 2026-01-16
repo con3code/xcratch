@@ -1,5 +1,13 @@
 import {isRtl} from 'scratch-l10n';
 import editorMessages from 'scratch-l10n/locales/editor-msgs';
+import blocksToImageTranslations from '../lib/blocks-to-image-translations.js';
+
+Object.keys(blocksToImageTranslations).forEach(locale => {
+    editorMessages[locale] = {
+        ...(editorMessages[locale] || {}),
+        ...blocksToImageTranslations[locale]
+    };
+});
 
 const UPDATE_LOCALES = 'scratch-gui/locales/UPDATE_LOCALES';
 const SELECT_LOCALE = 'scratch-gui/locales/SELECT_LOCALE';
