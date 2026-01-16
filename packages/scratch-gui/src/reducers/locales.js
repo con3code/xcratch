@@ -4,6 +4,7 @@ import missingTranslations from '../lib/missing-translations.js';
 import extensionLibraryTranslations from '../containers/extension-library-translations.js';
 import xcratchTagTranslations from '../lib/libraries/xcratch-tag-translations.js';
 import xcratchCategoryTranslations from '../lib/libraries/xcratch-category-translations.js';
+import blocksToImageTranslations from '../lib/blocks-to-image-translations.js';
 
 Object.keys(missingTranslations).forEach(locale => {
     editorMessages[locale] = {
@@ -30,6 +31,13 @@ Object.keys(xcratchCategoryTranslations).forEach(locale => {
     editorMessages[locale] = {
         ...(editorMessages[locale] || {}),
         ...xcratchCategoryTranslations[locale]
+    };
+});
+
+Object.keys(blocksToImageTranslations).forEach(locale => {
+    editorMessages[locale] = {
+        ...(editorMessages[locale] || {}),
+        ...blocksToImageTranslations[locale]
     };
 });
 
