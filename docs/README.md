@@ -91,7 +91,7 @@ Xcratch の開発に参加するには:
 
 3. 開発サーバーを起動
    ```bash
-   npm start
+   npm run start
    ```
 
 4. [DEVELOPMENT.md](DEVELOPMENT.md) でアーキテクチャを理解
