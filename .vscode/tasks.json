@@ -3,6 +3,23 @@
 	"tasks": [
 		{
 			"type": "shell",
+			"command": "npx --yes live-server .. --host=0.0.0.0 --port=5500 --https=./.vscode/live-server-https.cjs --no-browser",
+			"isBackground": true,
+			"problemMatcher": {
+				"owner": "custom",
+				"pattern": {
+					"regexp": "^$"
+				},
+				"background": {
+					"activeOnStart": true,
+					"beginsPattern": ".*",
+					"endsPattern": ".*Serving.*"
+				}
+			},
+			"label": "start live server"
+		},
+		{
+			"type": "shell",
 			"command": "export NODE_ENV='development' && npm run start --prefix ./packages/scratch-gui/",
 			"isBackground": true,
 			"problemMatcher": {
@@ -22,6 +39,14 @@
 			},
 			"label": "start https",
 			"detail": "webpack-dev-server --https"
+		},
+		{
+			"label": "start debug servers",
+			"dependsOrder": "sequence",
+			"dependsOn": [
+				"start live server",
+				"start https"
+			]
 		}
 	]
 }
