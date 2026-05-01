@@ -27,7 +27,8 @@ const vmManagerHOC = function (WrappedComponent) {
         constructor (props) {
             super(props);
             bindAll(this, [
-                'loadProject'
+                'loadProject',
+                'loadExtensionsFromURL'
             ]);
         }
         componentDidMount () {
@@ -40,6 +41,7 @@ const vmManagerHOC = function (WrappedComponent) {
                 // To load extension which is used in a project file.
                 this.props.vm.extensionManager.extensionLibraryContent = extensionLibraryContent;
                 preInstallExtensions(this.props.vm.extensionManager);
+                this.loadExtensionsFromURL();
             }
             if (!this.props.isPlayerOnly && !this.props.isStarted) {
                 this.props.vm.start();
@@ -56,6 +58,23 @@ const vmManagerHOC = function (WrappedComponent) {
             if (!this.props.isPlayerOnly && !this.props.isStarted) {
                 this.props.vm.start();
             }
+        }
+        loadExtensionsFromURL () {
+            const urls = window.location.search.substr(1)
+                .split('&')
+                .reduce((acc, cur) => {
+                    const eqIdx = cur.indexOf('=');
+                    if (eqIdx < 0) return acc;
+                    const key = cur.substring(0, eqIdx);
+                    const val = cur.substring(eqIdx + 1);
+                    if (key === 'extension' && val) {
+                        acc.push(decodeURIComponent(val));
+                    }
+                    return acc;
+                }, []);
+            urls.forEach(url => {
+                this.props.vm.extensionManager.loadExtensionURL(url);
+            });
         }
         getProjectData () {
             const search = window.location.search.substr(1)
