@@ -336,6 +336,10 @@ class ExtensionLibrary extends React.PureComponent {
                 inputUrl = userInput;
                 return this.props.vm.extensionManager.fetchExtension(userInput);
             })
+            .catch(xcratchError => {
+                log.info(`fetchExtension failed for ${inputUrl}, trying TurboWarp format:\n${xcratchError.message}`);
+                return this.props.vm.extensionManager.fetchExtensionTurboWarp(inputUrl);
+            })
             .then(({entry, blockClass}) => {
                 id = entry.extensionId;
                 const existingEntry = extensionLibraryContent.find(libEntry => libEntry.extensionId === id);
