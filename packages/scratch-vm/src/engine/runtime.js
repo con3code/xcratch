@@ -424,6 +424,22 @@ class Runtime extends EventEmitter {
     }
 
     /**
+     * Width of the stage, in pixels (instance accessor for TurboWarp-compatible extensions).
+     * @type {number}
+     */
+    get stageWidth () {
+        return Runtime.STAGE_WIDTH;
+    }
+
+    /**
+     * Height of the stage, in pixels (instance accessor for TurboWarp-compatible extensions).
+     * @type {number}
+     */
+    get stageHeight () {
+        return Runtime.STAGE_HEIGHT;
+    }
+
+    /**
      * Event name for glowing a script.
      * @constant {string}
      */
