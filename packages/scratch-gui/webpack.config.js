@@ -267,6 +267,7 @@ const buildConfig = baseConfig.clone()
 // Enable HTTPS for the dev server
 buildConfig.merge({
     devServer: {
+        historyApiFallback: true,
         server: {
             type: 'https',
             options: {
