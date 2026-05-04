@@ -25,7 +25,7 @@ For convenience, we've included a development server with the VM. This is someti
 ## Running the Development Server
 Open a Command Prompt or Terminal in the repository and run:
 ```bash
-npm start
+npm run start
 ```
 
 ## Playground

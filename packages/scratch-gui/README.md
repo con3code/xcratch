@@ -36,7 +36,7 @@ Running the project requires Node.js to be installed.
 Open a Command Prompt or Terminal in the repository and run:
 
 ```bash
-npm start
+npm run start
 ```
 
 Then go to [http://localhost:8601/](http://localhost:8601/) - the playground outputs the default GUI component

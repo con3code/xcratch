@@ -472,7 +472,7 @@ module.exports = {
 
 2. **開発ビルド**
    ```bash
-   npm start
+   npm run start
    ```
 
 3. **プロダクションビルド**
@@ -546,7 +546,7 @@ buildConfig.merge({
 ```
 
 ```bash
-npm start
+npm run start
 ```
 
 ブラウザで `https://localhost:8601` にアクセス
