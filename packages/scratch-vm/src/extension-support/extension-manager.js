@@ -60,7 +60,7 @@ const builtinExtensions = {
  */
 
 class ExtensionManager {
-    constructor (runtime) {
+    constructor (runtime, vm) {
         /**
          * The ID number to provide to the next extension worker.
          * @type {int}
@@ -93,6 +93,7 @@ class ExtensionManager {
          * @type {Runtime}
          */
         this.runtime = runtime;
+        this.vm = vm || null;
 
         dispatch.setService('extensions', this).catch(e => {
             log.error(`ExtensionManager was unable to register extension service: ${JSON.stringify(e)}`);
@@ -138,6 +139,93 @@ class ExtensionManager {
         const extensionInstance = new extension(this.runtime);
         const serviceName = this._registerInternalExtension(extensionInstance);
         this._loadedExtensions.set(extensionId, serviceName);
+    }
+
+    /**
+     * Load a TurboWarp-compatible extension (calls Scratch.extensions.register()) via a script tag.
+     * @param {string} extensionURL - URL for the extension script.
+     * @returns {Promise<{entry: object, blockClass: Function}>}
+     */
+    fetchExtensionTurboWarp (extensionURL) {
+        const vm = this.vm || this.runtime;
+        return new Promise((resolve, reject) => {
+            const previousScratch = window.Scratch;
+            let settled = false;
+            const settle = fn => (...args) => {
+                if (settled) return;
+                settled = true;
+                window.Scratch = previousScratch;
+                fn(...args);
+            };
+
+            // Build the Scratch global following TurboWarp's unsandboxed extension API.
+            const Scratch = {
+                BlockType: require('./block-type'),
+                ArgumentType: require('./argument-type'),
+                TargetType: require('./target-type'),
+                Cast: require('../util/cast'),
+                vm,
+                renderer: vm.runtime ? vm.runtime.renderer : vm.renderer,
+                extensions: {
+                    unsandboxed: true,
+                    register: instance => {
+                        const info = instance.getInfo();
+                        if (!info || !info.id) {
+                            settle(reject)(new Error('Extension getInfo() returned invalid data'));
+                            return;
+                        }
+                        const entry = {
+                            extensionId: info.id,
+                            extensionURL: extensionURL,
+                            name: info.name || info.id,
+                            iconURL: info.blockIconURI || null,
+                            insetIconURL: info.menuIconURI || null
+                        };
+                        const blockClass = instance.constructor;
+                        blockClass.extensionURL = extensionURL;
+                        settle(resolve)({entry, blockClass});
+                    }
+                }
+            };
+
+            // Minimal translate shim: translate.setup() stores translations,
+            // translate(msg) returns the default message string.
+            let storedTranslations = {};
+            const getLocale = () => (vm && vm.getLocale ? vm.getLocale() : navigator.language);
+            const translate = msg => {
+                if (msg && typeof msg === 'object') {
+                    const locale = getLocale();
+                    const translations = storedTranslations[locale] || {};
+                    const id = msg.id || `_${msg.default}`;
+                    return translations[id] || msg.default || String(msg);
+                }
+                return String(msg);
+            };
+            translate.setup = newTranslations => {
+                if (newTranslations) storedTranslations = newTranslations;
+            };
+            Scratch.translate = translate;
+
+            // Permissioned fetch — allow all fetches in xcratch (no securityManager).
+            Scratch.fetch = (url, options) => fetch(url, options);
+            Scratch.canFetch = () => Promise.resolve(true);
+            Scratch.openWindow = (url, features) => window.open(url, '_blank',
+                features ? `noreferrer,${features}` : 'noreferrer');
+            Scratch.canOpenWindow = () => Promise.resolve(true);
+            Scratch.redirect = url => {
+                location.href = url;
+            };
+            Scratch.canRedirect = () => Promise.resolve(true);
+
+            window.Scratch = Scratch;
+
+            const script = document.createElement('script');
+            script.src = extensionURL;
+            script.onerror = () => {
+                settle(reject)(new Error(`Failed to load script: ${extensionURL}`));
+            };
+            document.body.appendChild(script);
+        });
     }
 
     /**
@@ -231,6 +319,14 @@ class ExtensionManager {
         }
         const serviceName = this._registerInternalExtension(extensionInstance);
         this._loadedExtensions.set(extensionID, serviceName);
+        // Ensure the extension URL is stored on the runtime block info so that
+        // project serialization records it for re-loading from the network.
+        if (entry.extensionURL) {
+            const categoryInfo = this.runtime._blockInfo.find(info => info.id === extensionID);
+            if (categoryInfo) {
+                categoryInfo.extensionURL = entry.extensionURL;
+            }
+        }
         const oldEntryIndex = this.extensionLibraryContent
             .findIndex(libEntry => libEntry.extensionId === extensionID);
         if (oldEntryIndex >= 0) {
@@ -276,11 +372,16 @@ class ExtensionManager {
         }
 
         // To access the runtime even in outer extensions, it loaded by dynamic import() instead of extension-worker.
-        // Try to load from URL first, fallback to preloaded version if it fails (regardless of online status)
+        // Try xcratch format first, then TurboWarp format, then fall back to preloaded version.
         return this.fetchExtension(extensionURL)
             .then(({entry, blockClass}) => {
                 this.registerExtensionBlock(entry, blockClass);
             })
+            .catch(() => this.fetchExtensionTurboWarp(extensionURL)
+                .then(({entry, blockClass}) => {
+                    this.registerExtensionBlock(entry, blockClass);
+                })
+            )
             .catch(error => {
                 // If the extension is preloaded, register it.
                 const preloadedExt = this.preloadedExtensions.get(extensionURL);
