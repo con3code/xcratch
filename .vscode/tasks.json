@@ -3,7 +3,7 @@
 	"tasks": [
 		{
 			"type": "shell",
-			"command": "npx --yes live-server .. --host=0.0.0.0 --port=5500 --https=./.vscode/live-server-https.cjs --no-browser",
+			"command": "npx --yes live-server .. --host=0.0.0.0 --port=5500 --https=./.vscode/live-server-https.cjs --cors --no-browser",
 			"isBackground": true,
 			"problemMatcher": {
 				"owner": "custom",
