@@ -52,6 +52,31 @@
         "webpack://GUI/scratch-svg-renderer/*": "${webRoot}/scratch-editor/packages/scratch-svg-renderer/*",
         "https://0.0.0.0:5500/*": "${webRoot}/*", // local extension server for debugging
       }
+    },
+    {
+      "type": "chrome",
+      "request": "launch",
+      "preLaunchTask": "start debug servers",
+      "name": "debug extension on dev-server",
+      "url": "https://localhost:8601/?extension=${input:extensionUrl}",
+      "webRoot": "${workspaceFolder}/..",
+      "sourceMaps": true,
+      "sourceMapRenames": true,
+      "sourceMapPathOverrides": {
+        "webpack://GUI/*": "${webRoot}/scratch-editor/packages/scratch-gui/*",
+        "webpack://GUI/scratch-vm/*": "${webRoot}/scratch-editor/packages/scratch-vm/*",
+        "webpack://GUI/scratch-render/*": "${webRoot}/scratch-editor/packages/scratch-render/*",
+        "webpack://GUI/scratch-svg-renderer/*": "${webRoot}/scratch-editor/packages/scratch-svg-renderer/*",
+        "https://0.0.0.0:5500/*": "${webRoot}/*", // local extension server for debugging
+      }
+    }
+  ],
+  "inputs": [
+    {
+      "id": "extensionUrl",
+      "type": "promptString",
+      "description": "Extension URL to load, for example: https://0.0.0.0:5500/xcx-example/dist/block.mjs",
+      "default": "https://0.0.0.0:5500/"
     }
   ]
 }
