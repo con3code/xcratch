@@ -8,10 +8,12 @@ import {injectIntl} from 'react-intl';
 import VMScratchBlocks from '../lib/blocks';
 import VM from '@scratch/scratch-vm';
 import {initializeBlocksToImage} from '../lib/blocks-to-image';
+import {initializeEditValueInEditor} from '../lib/edit-value-in-editor';
 
 import analytics from '../lib/analytics';
 import log from '../lib/log.js';
 import Prompt from './prompt.jsx';
+import ValueEditorPrompt from '../components/value-editor-prompt/value-editor-prompt.jsx';
 import BlocksComponent from '../components/blocks/blocks.jsx';
 import ExtensionLibrary from './extension-library.jsx';
 import extensionData from '../lib/libraries/extensions/index.jsx';
@@ -68,6 +70,9 @@ class Blocks extends React.Component {
             'handlePromptStart',
             'handlePromptCallback',
             'handlePromptClose',
+            'handleValueEditorOpen',
+            'handleValueEditorOk',
+            'handleValueEditorClose',
             'handleCustomProceduresClose',
             'onScriptGlowOn',
             'onScriptGlowOff',
@@ -88,7 +93,8 @@ class Blocks extends React.Component {
         this.ScratchBlocks.recordSoundCallback = this.handleOpenSoundRecorder;
 
         this.state = {
-            prompt: null
+            prompt: null,
+            valueEditor: null
         };
         this.onTargetsUpdate = debounce(this.onTargetsUpdate, 100);
         this.toolboxUpdateQueue = [];
@@ -105,6 +111,14 @@ class Blocks extends React.Component {
 
         // Initialize blocks to image functionality
         initializeBlocksToImage(this.ScratchBlocks, this.props.intl.formatMessage);
+
+        // Initialize edit-value-in-editor context menu functionality
+        initializeEditValueInEditor(
+            this.ScratchBlocks,
+            this.props.intl.formatMessage,
+            this.props.vm,
+            this.handleValueEditorOpen
+        );
 
         const workspaceConfig = defaultsDeep({},
             Blocks.defaultOptions,
@@ -161,6 +175,7 @@ class Blocks extends React.Component {
     shouldComponentUpdate (nextProps, nextState) {
         return (
             this.state.prompt !== nextState.prompt ||
+            this.state.valueEditor !== nextState.valueEditor ||
             this.props.isVisible !== nextProps.isVisible ||
             this._renderedToolboxXML !== nextProps.toolboxXML ||
             this.props.extensionLibraryVisible !== nextProps.extensionLibraryVisible ||
@@ -548,6 +563,38 @@ class Blocks extends React.Component {
     handlePromptClose () {
         this.setState({prompt: null});
     }
+    handleValueEditorOpen ({variableId, variableName, isList, index}) {
+        const target = this.props.vm.editingTarget;
+        if (!target) return;
+        const value = this.props.vm.getVariableValue(target.id, variableId);
+        let defaultValue;
+        if (isList) {
+            if (!Array.isArray(value) || index < 1 || index > value.length) return;
+            defaultValue = String(value[index - 1]);
+        } else {
+            if (value === null) return;
+            defaultValue = String(value);
+        }
+        this.setState({valueEditor: {variableId, variableName, isList, index, targetId: target.id, defaultValue}});
+    }
+    handleValueEditorOk (newValue) {
+        const {valueEditor} = this.state;
+        const vm = this.props.vm;
+        if (valueEditor.isList) {
+            const list = vm.getVariableValue(valueEditor.targetId, valueEditor.variableId);
+            if (Array.isArray(list) && valueEditor.index <= list.length) {
+                const newList = list.slice();
+                newList[valueEditor.index - 1] = newValue;
+                vm.setVariableValue(valueEditor.targetId, valueEditor.variableId, newList);
+            }
+        } else {
+            vm.setVariableValue(valueEditor.targetId, valueEditor.variableId, newValue);
+        }
+        this.setState({valueEditor: null});
+    }
+    handleValueEditorClose () {
+        this.setState({valueEditor: null});
+    }
     handleCustomProceduresClose (data) {
         this.props.onRequestCloseCustomProcedures(data);
         const ws = this.workspace;
@@ -608,6 +655,16 @@ class Blocks extends React.Component {
                         vm={vm}
                         onCancel={this.handlePromptClose}
                         onOk={this.handlePromptCallback}
+                    />
+                ) : null}
+                {this.state.valueEditor ? (
+                    <ValueEditorPrompt
+                        defaultValue={this.state.valueEditor.defaultValue}
+                        index={this.state.valueEditor.index}
+                        isList={this.state.valueEditor.isList}
+                        variableName={this.state.valueEditor.variableName}
+                        onCancel={this.handleValueEditorClose}
+                        onOk={this.handleValueEditorOk}
                     />
                 ) : null}
                 {extensionLibraryVisible ? (
