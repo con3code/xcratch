@@ -105,8 +105,12 @@ const baseConfig = new ScratchWebpackConfigBuilder(
         ]
     }));
 
-// Add Workbox plugin for service worker generation
-if (process.env.NODE_ENV === 'development') {
+// Add Workbox plugin for service worker generation.
+// Skip when running under the dev server (webpack-cli sets WEBPACK_SERVE=true)
+// — generating the SW in watch mode produces an inaccurate precache manifest
+// (https://github.com/GoogleChrome/workbox/issues/1790) and is unneeded for
+// local development.
+if (process.env.NODE_ENV === 'development' || process.env.WEBPACK_SERVE) {
     console.log('Skipping Workbox plugin for service worker generation');
 } else {
     // eslint-disable-next-line global-require
