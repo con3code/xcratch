@@ -9,11 +9,13 @@ import VMScratchBlocks from '../lib/blocks';
 import VM from '@scratch/scratch-vm';
 import {initializeBlocksToImage} from '../lib/blocks-to-image';
 import {initializeEditValueInEditor} from '../lib/edit-value-in-editor';
+import {initializeListEditor} from '../lib/list-editor';
 
 import analytics from '../lib/analytics';
 import log from '../lib/log.js';
 import Prompt from './prompt.jsx';
 import ValueEditorPrompt from '../components/value-editor-prompt/value-editor-prompt.jsx';
+import ListEditorModal from '../components/list-editor-modal/list-editor-modal.jsx';
 import BlocksComponent from '../components/blocks/blocks.jsx';
 import ExtensionLibrary from './extension-library.jsx';
 import extensionData from '../lib/libraries/extensions/index.jsx';
@@ -73,6 +75,10 @@ class Blocks extends React.Component {
             'handleValueEditorOpen',
             'handleValueEditorOk',
             'handleValueEditorClose',
+            'handleListEditorOpen',
+            'handleListEditorChange',
+            'handleListEditorClose',
+            'handleListEditorRevert',
             'handleCustomProceduresClose',
             'onScriptGlowOn',
             'onScriptGlowOff',
@@ -94,7 +100,8 @@ class Blocks extends React.Component {
 
         this.state = {
             prompt: null,
-            valueEditor: null
+            valueEditor: null,
+            listEditor: null
         };
         this.onTargetsUpdate = debounce(this.onTargetsUpdate, 100);
         this.toolboxUpdateQueue = [];
@@ -118,6 +125,14 @@ class Blocks extends React.Component {
             this.props.intl.formatMessage,
             this.props.vm,
             this.handleValueEditorOpen
+        );
+
+        // Initialize list editor context menu functionality
+        initializeListEditor(
+            this.ScratchBlocks,
+            this.props.intl.formatMessage,
+            this.props.vm,
+            this.handleListEditorOpen
         );
 
         const workspaceConfig = defaultsDeep({},
@@ -176,6 +191,7 @@ class Blocks extends React.Component {
         return (
             this.state.prompt !== nextState.prompt ||
             this.state.valueEditor !== nextState.valueEditor ||
+            this.state.listEditor !== nextState.listEditor ||
             this.props.isVisible !== nextProps.isVisible ||
             this._renderedToolboxXML !== nextProps.toolboxXML ||
             this.props.extensionLibraryVisible !== nextProps.extensionLibraryVisible ||
@@ -595,6 +611,53 @@ class Blocks extends React.Component {
     handleValueEditorClose () {
         this.setState({valueEditor: null});
     }
+    handleListEditorOpen ({listId, listName, targetId}) {
+        const vm = this.props.vm;
+        const target = vm.runtime.getTargetById(targetId);
+        if (!target) return;
+        const variable = target.lookupVariableById(listId);
+        if (!variable || !Array.isArray(variable.value)) return;
+        // Snapshot the original value at open time so the user can "revert"
+        // the entire edit session (reorders, deletions, item-text edits).
+        // The live value is read out of the VM on every render so any commit
+        // from the modal is reflected immediately.
+        const originalValue = variable.value.slice();
+        this.setState({listEditor: {listId, listName, targetId, originalValue}});
+    }
+    handleListEditorChange (newValue) {
+        const {listEditor} = this.state;
+        if (!listEditor) return;
+        const vm = this.props.vm;
+        vm.setVariableValue(listEditor.targetId, listEditor.listId, newValue.slice());
+        // Force a re-render so the modal picks up the just-committed value.
+        this.forceUpdate();
+    }
+    handleListEditorRevert () {
+        const {listEditor} = this.state;
+        if (!listEditor) return;
+        // Restore the value captured at open time. The modal stays open so
+        // the user can keep editing from the restored state.
+        this.props.vm.setVariableValue(
+            listEditor.targetId,
+            listEditor.listId,
+            listEditor.originalValue.slice()
+        );
+        this.forceUpdate();
+    }
+    handleListEditorClose () {
+        this.setState({listEditor: null});
+    }
+    _getListEditorValue () {
+        const {listEditor} = this.state;
+        if (!listEditor) return [];
+        try {
+            const value = this.props.vm.getVariableValue(
+                listEditor.targetId, listEditor.listId);
+            return Array.isArray(value) ? value : [];
+        } catch (e) {
+            return [];
+        }
+    }
     handleCustomProceduresClose (data) {
         this.props.onRequestCloseCustomProcedures(data);
         const ws = this.workspace;
@@ -655,6 +718,16 @@ class Blocks extends React.Component {
                         vm={vm}
                         onCancel={this.handlePromptClose}
                         onOk={this.handlePromptCallback}
+                    />
+                ) : null}
+                {this.state.listEditor ? (
+                    <ListEditorModal
+                        intl={this.props.intl}
+                        listName={this.state.listEditor.listName}
+                        value={this._getListEditorValue()}
+                        onChange={this.handleListEditorChange}
+                        onClose={this.handleListEditorClose}
+                        onRevert={this.handleListEditorRevert}
                     />
                 ) : null}
                 {this.state.valueEditor ? (

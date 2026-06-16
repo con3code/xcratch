@@ -13,23 +13,45 @@
     <% } %>
     <script>
       if ('serviceWorker' in navigator) {
-        window.addEventListener('load', function () {
-          navigator.serviceWorker.register('./service-worker.js', { updateViaCache: 'none' }).then(function (registration) {
-            console.log('PWA worker registration successful', registration.scope);
-          }, function (err) {
-            console.log('PWA worker registration failed', err);
-          }).catch(function (err) {
-            console.log(err);
-          });
-        });
+        // Skip Service Worker on the webpack-dev-server. The dev build does
+        // not ship a service worker, but a stale registration from a previous
+        // production visit on the same host would trigger 'controllerchange'
+        // and reload the page in a loop (see git: "reload page on service
+        // worker controller change"). Unregister any leftovers and drop
+        // their caches so the editor can load normally.
+        var isLocalDev = location.hostname === 'localhost'
+          || location.hostname === '127.0.0.1'
+          || location.hostname === '0.0.0.0'
+          || location.port === '8601';
 
-        // 新しい Service Worker がアクティブになりページ制御を開始したときにリロードする
-        let refreshing = false;
-        navigator.serviceWorker.addEventListener('controllerchange', function () {
-          if (refreshing) return;
-          refreshing = true;
-          window.location.reload();
-        });
+        if (isLocalDev) {
+          navigator.serviceWorker.getRegistrations().then(function (regs) {
+            regs.forEach(function (r) { r.unregister(); });
+          }).catch(function () { /* noop */ });
+          if (window.caches && caches.keys) {
+            caches.keys().then(function (keys) {
+              keys.forEach(function (k) { caches.delete(k); });
+            }).catch(function () { /* noop */ });
+          }
+        } else {
+          window.addEventListener('load', function () {
+            navigator.serviceWorker.register('./service-worker.js', { updateViaCache: 'none' }).then(function (registration) {
+              console.log('PWA worker registration successful', registration.scope);
+            }, function (err) {
+              console.log('PWA worker registration failed', err);
+            }).catch(function (err) {
+              console.log(err);
+            });
+          });
+
+          // 新しい Service Worker がアクティブになりページ制御を開始したときにリロードする
+          var refreshing = false;
+          navigator.serviceWorker.addEventListener('controllerchange', function () {
+            if (refreshing) return;
+            refreshing = true;
+            window.location.reload();
+          });
+        }
       } else {
         console.log('Service Worker is not supported by browser.');
       }
